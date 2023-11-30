@@ -7,6 +7,6 @@ namespace GardenApp.API.Data.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string PlantName { get; set; }
+        public string PlantName { get; set; } = null!;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace GardenApp.API.Data.Repositories
 {
-    public interface IBaseRepository<T, TKey>
+    public interface IBaseRepository<T, TKey> where T : class
     {
         Task<T> Get(TKey id);
         Task<List<T>> GetAll();

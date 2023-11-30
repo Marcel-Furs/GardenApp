@@ -11,6 +11,6 @@ namespace GardenApp.API.Data.Models
         [Required]
         public int DeviceId { get; set; }
         [Required]
-        public Device Device { get; set; }
+        public Device Device { get; set; } = null!;
     }
 }

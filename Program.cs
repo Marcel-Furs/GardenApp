@@ -1,4 +1,9 @@
+using GardenApp.API.Data;
+using GardenApp.API.Data.Models;
+using GardenApp.API.Data.Repositories;
+using GardenApp.API.Data.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.EntityFrameworkCore;
 
 namespace GardenApp
 {
@@ -9,6 +14,10 @@ namespace GardenApp
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var connectionString = builder.Configuration.GetConnectionString("Default");
+            builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

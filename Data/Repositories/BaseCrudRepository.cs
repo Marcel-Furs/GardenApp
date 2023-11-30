@@ -1,14 +1,17 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace GardenApp.API.Data.Repositories
 {
-    public abstract class BaseCrudRepository<T, TKey> : IBaseRepository<T, TKey>
+    public class BaseCrudRepository<T, TKey> : IBaseRepository<T, TKey> where T : class
     {
         protected readonly DataContext context;
+        protected readonly DbSet<T> table;
 
         public BaseCrudRepository(DataContext context)
         {
             this.context = context;
+            this.table = context.Set<T>();
         }
 
         public async Task Create(T entity)
@@ -30,9 +33,21 @@ namespace GardenApp.API.Data.Repositories
             await context.SaveChangesAsync();
         }
 
-        public abstract Task<T> Get(TKey id);
-        public abstract Task<List<T>> GetAll();
-        public abstract Task<T> Get(Expression<Func<T, bool>> exp);
-        public abstract Task<List<T>> GetAll(Expression<Func<T, bool>> exp);
+        public async Task<T> Get(TKey id)
+        {
+            return await table.FindAsync(id);
+        }
+        public async Task<List<T>> GetAll()
+        {
+            return await table.ToListAsync();
+        }
+        public async Task<T> Get(Expression<Func<T, bool>> exp)
+        {
+            return await table.Where(exp).FirstOrDefaultAsync();
+        }
+        public async Task<List<T>> GetAll(Expression<Func<T, bool>> exp)
+        {
+            return await table.Where(exp).ToListAsync();
+        }
     }
 }

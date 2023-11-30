@@ -11,6 +11,6 @@ namespace GardenApp.API.Data.Models
         [Required]
         public int UserId { get; set; }
         [Required]
-        public User User { get; set; }
+        public User User { get; set; } = null!;
     }
 }

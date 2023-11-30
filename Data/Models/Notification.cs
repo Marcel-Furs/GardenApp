@@ -7,10 +7,10 @@ namespace GardenApp.API.Data.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public string Message { get; set; }
+        public string Message { get; set; } = null!;
         [Required]
         public int UserId { get; set; }
         [Required]
-        public User User { get; set; }
+        public User User { get; set; } = null!;
     }
 }
