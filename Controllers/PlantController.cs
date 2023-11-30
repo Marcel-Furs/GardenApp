@@ -33,8 +33,17 @@ namespace GardenApp.API.Controllers
         {
             //return Ok(await plantRepository.GetAll());
             // return Ok(await plantRepository.Get(1));
-            //return Ok(await plantRepository.GetAll(x => x.Id == 2));
+            //return Ok(await unitOfWork.PlantRepository.GetAll(x => x.Id == 2));
             return Ok(await unitOfWork.PlantRepository.Get(x => x.PlantName == "stokrotka"));
+        }
+
+        [HttpGet("Marcel")]
+        public async Task<IActionResult> GetId()
+        {
+            //return Ok(await plantRepository.GetAll());
+            // return Ok(await plantRepository.Get(1));
+            return Ok(await unitOfWork.PlantRepository.GetAll(x => x.Id == 2));
+            //return Ok(await unitOfWork.PlantRepository.Get(x => x.PlantName == "stokrotka"));
         }
     }
 }
