@@ -18,14 +18,14 @@ namespace GardenApp.API.Services
             this.hashService = hashService;
         }
 
-        public async Task<int> AuthUser(string username, string password)
+        public User AuthUser(string username, string password)
         {
-            var user = await userRepository.Get(x => x.Username == username);
-            if (user == null || !hashService.CompareHash(password, user.PasswordHash, user.PasswordSalt))
+            var user = userRepository.Find(u => u.Username == username) ?? throw new InvalidCredentialsException("Invalid credentials");
+            if (!hashService.CompareHash(password, user.PasswordHash, user.PasswordSalt))
             {
                 throw new InvalidCredentialsException("Invalid credentials");
             }
-            return user.Id;
+            return user;
         }
 
         public void RegisterUser(string username, string password)

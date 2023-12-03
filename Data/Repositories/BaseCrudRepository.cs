@@ -57,6 +57,7 @@ namespace GardenApp.API.Data.Repositories
         public async Task<T> Get(Expression<Func<T, bool>> exp)
         {
             return await table.Where(exp).FirstOrDefaultAsync();
+
         }
         public async Task<List<T>> GetAll(Expression<Func<T, bool>> exp)
         {

@@ -6,6 +6,6 @@ namespace GardenApp.API.Services
     public interface IUserService
     {
         void RegisterUser(string username, string password);
-        Task<int> AuthUser(string username, string password);
+        User AuthUser(string username, string password);
     }
 }
