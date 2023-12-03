@@ -1,43 +1,48 @@
 ﻿using GardenApp.API.Data.Models;
 using GardenApp.API.Data.Repositories;
 using GardenApp.API.Exceptions;
+using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace GardenApp.API.Services
 {
     public class UserService : IUserService
     {
         private readonly IBaseRepository<User, int> userRepository;
-        //private readonly IHashService hashService;
+        private readonly IHashService hashService;
 
-        public UserService(IBaseRepository<User, int> userRepository)//, IHashService hashService)
+        public UserService(IBaseRepository<User, int> userRepository, IHashService hashService)
         {
             this.userRepository = userRepository;
-            //this.hashService = hashService;
+            this.hashService = hashService;
         }
 
-        public async Task CreateUser(User user, string password)
+        public User AuthUser(string username, string password)
         {
-            //hashService.CreateHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-            //user.PasswordHash = passwordHash;
-            //user.PasswordSalt = passwordSalt;
-            await userRepository.Create(user);
+            var user = userRepository.Find(u => u.Username == username) ?? throw new InvalidCredentialsException("Invalid credentials");
+            if (!hashService.CompareHash(password, user.PasswordHash, user.PasswordSalt))
+            {
+                throw new InvalidCredentialsException("Invalid credentials");
+            }
+            return user;
         }
 
-        //public async Task<User> Authorize(string username, string password)
-        //{
-        //    var user = await userRepository.Get(u => u.Username == username) ?? throw new InvalidCredentialsException();
-        //    if (!hashService.CompareHash(password, user.PasswordHash, user.PasswordSalt))
-        //    {
-        //        throw new InvalidCredentialsException();
-        //    }
-        //    return user;
-        //}
-
-        public async Task<User> GetUserFromRequest(ClaimsPrincipal claimsPrincipal)
+        public void RegisterUser(string username, string password)
         {
-            string id = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await userRepository.Get(int.Parse(id));
+            var user = userRepository.Find(x => x.Username == username);
+            if (user != null)
+            {
+                throw new InvalidCredentialsException($"User with name {username} already exists!");
+            }
+
+            hashService.CreateHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+            userRepository.Add(new User
+            {
+                Username = username,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
+            });
         }
     }
 }

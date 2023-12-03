@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 
 namespace GardenApp.API.Data.Repositories
@@ -20,6 +22,12 @@ namespace GardenApp.API.Data.Repositories
             await context.SaveChangesAsync();
         }
 
+        public async Task Add(T entity)
+        {
+            await context.AddAsync(entity);
+            await context.SaveChangesAsync();
+        }
+
         public async Task Update(T entity)
         {
             context.Update(entity);
@@ -33,6 +41,11 @@ namespace GardenApp.API.Data.Repositories
             await context.SaveChangesAsync();
         }
 
+        public T Find(Expression<Func<T, bool>> predicate)
+        {
+            return table.FirstOrDefault(predicate);
+        }
+
         public async Task<T> Get(TKey id)
         {
             return await table.FindAsync(id);
@@ -44,6 +57,7 @@ namespace GardenApp.API.Data.Repositories
         public async Task<T> Get(Expression<Func<T, bool>> exp)
         {
             return await table.Where(exp).FirstOrDefaultAsync();
+
         }
         public async Task<List<T>> GetAll(Expression<Func<T, bool>> exp)
         {

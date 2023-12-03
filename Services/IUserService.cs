@@ -5,11 +5,7 @@ namespace GardenApp.API.Services
 {
     public interface IUserService
     {
-        public interface IUserService
-        {
-            Task<User> Authorize(string username, string password);
-            Task CreateUser(User user, string password);
-            Task<User> GetUserFromRequest(ClaimsPrincipal claimsPrincipal);
-        }
+        void RegisterUser(string username, string password);
+        User AuthUser(string username, string password);
     }
 }
