@@ -2,6 +2,7 @@
 using GardenApp.API.Data.Models;
 using GardenApp.API.Data.Repositories;
 using GardenApp.API.Data.UnitOfWork;
+using GardenApp.API.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,7 +21,7 @@ namespace GardenApp.API.Controllers
             this.unitOfWork = unitOfWork;
         }
 
-        [HttpPost("create")]
+        /*[HttpPost("create")]
         public async Task<IActionResult> TestCreate([FromBody] string name)
         {
             await unitOfWork.PlantRepository.Create(new Plant
@@ -28,7 +29,7 @@ namespace GardenApp.API.Controllers
                 PlantName = name
             });
             return Ok();
-        }
+        }*/
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
@@ -48,12 +49,13 @@ namespace GardenApp.API.Controllers
             //return Ok(await unitOfWork.PlantRepository.Get(x => x.PlantName == "stokrotka"));
         }
 
-        [HttpPost("{plantId}/ImportFile")]
-        public async Task<IActionResult> ImportFile(int plantId, [FromForm] IFormFile file)
+        [HttpPost("Create")]
+        public async Task<IActionResult> ImportFile([FromForm] PlantCreateDto model)
         {
             //przypisanie planta do zmiennej na podstawie plantId
             //jesli nie istnieje to zwroc jakis 404
 
+            var file = model.Image;
             string name = file.FileName;
             string extension = Path.GetExtension(file.FileName);
             //read the file
@@ -68,13 +70,19 @@ namespace GardenApp.API.Controllers
                         Directory.CreateDirectory(MediaDir);
                     }
                     byte[] fileBytes = memoryStream.ToArray();
-                    System.IO.File.WriteAllBytes(Path.Combine(MediaDir, Guid.NewGuid() + "_" + name), fileBytes);
-                    //plant.ImagePath = Path.Combine(MediaDir, Guid.NewGuid() + "_" + name)
-                    //service.updatePlant(plant)
+                    var path = Path.Combine(MediaDir, Guid.NewGuid() + "_" + name);
+                    System.IO.File.WriteAllBytes(path, fileBytes);
+                    Plant plant = new Plant
+                    {
+                        PathImage = path,
+                        PlantName = model.PlantName,
+                    };
+                    await unitOfWork.PlantRepository.Add(plant);
+                    return Ok(new { Message = "Created"});
                 }
             }
 
-            return Ok();
+            return BadRequest(ModelState);
         }
 
         [HttpGet("Image/{name}")]

@@ -1,7 +1,9 @@
-﻿namespace GardenApp.API.Services
+﻿using GardenApp.API.Data.Models;
+
+namespace GardenApp.API.Services
 {
     public interface ITokenService
     {
-        string CreateToken(string userId, string username);
+        string CreateToken(User user, string username);
     }
 }

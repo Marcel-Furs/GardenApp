@@ -45,8 +45,12 @@ namespace GardenApp.API.Controllers
             {
                 try
                 {
-                    var userId = userService.AuthUser(userDto.Username, userDto.Password);
-                    return Ok(new { Token = tokenService.CreateToken(userId.ToString(), userDto.Username) });
+                    var user = userService.AuthUser(userDto.Username, userDto.Password);
+
+                    string token = tokenService.CreateToken(user, userDto.Username);
+
+                    // Zwracanie tokenu w odpowiedzi
+                    return Ok(new { Token = token });
                 }
                 catch (InvalidCredentialsException ex)
                 {
