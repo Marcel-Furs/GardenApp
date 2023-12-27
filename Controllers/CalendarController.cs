@@ -1,4 +1,5 @@
-﻿using GardenApp.API.Attributes;
+﻿using AutoMapper;
+using GardenApp.API.Attributes;
 using GardenApp.API.Data.Models;
 using GardenApp.API.Data.UnitOfWork;
 using GardenApp.API.Dto;
@@ -11,12 +12,14 @@ namespace GardenApp.API.Controllers
     public class CalendarController : Controller
     {
         private readonly IUnitOfWork unitOfWork;
-        public CalendarController(IUnitOfWork unitOfWork)
+        private readonly IMapper mapper;
+        public CalendarController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
         [HttpPost("create")]
-        public async Task<IActionResult> TestCreate([FromBody] CalendarDto calendarDto)
+        public async Task<IActionResult> Create([FromBody] CalendarDto calendarDto)
         {
             try
             {
@@ -24,14 +27,13 @@ namespace GardenApp.API.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-
-                //DateTime trimmedDate = TrimTime(calendarDto.EventDate);
                 calendarDto.EventDate = calendarDto.EventDate.Date;
 
                 await unitOfWork.CalendarRepository.Create(new Calendar
                 {
                     Description = calendarDto.Description,
                     EventDate = calendarDto.EventDate,
+                    IsActive = calendarDto.IsActive,
                     UserId = calendarDto.UserId
                 });
 
@@ -43,10 +45,52 @@ namespace GardenApp.API.Controllers
                 return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
             }
         }
-        //private DateTime TrimTime(DateTime dateTime)
-        //{
-        //    return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0);
-        //}
 
+        [HttpGet("{id}/days")]
+        public async Task<IActionResult> GetDays(int id)
+        {
+            try
+            {
+                var days = await unitOfWork.CalendarRepository.GetAll(calendar => calendar.UserId == id && calendar.IsActive == false);
+
+                var orderedDays = days.OrderBy(calendar => calendar.EventDate).ToList();
+
+
+                return Ok(mapper.Map<List<CalendarDto>>(orderedDays));
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd podczas pobierania dni kalendarza: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
+
+        [HttpPost("{dayId}/update")]
+        public async Task<IActionResult> UpdateDayStatus(int dayId, [FromBody] CalendarDto calendarDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var day = await unitOfWork.CalendarRepository.Get(dayId);
+                if (day == null)
+                {
+                    return NotFound($"Dzień o ID {dayId} nie został znaleziony.");
+                }
+
+                day.IsActive = calendarDto.IsActive;
+                unitOfWork.CalendarRepository.Update(day);
+
+                return Ok(new { Message = "Status aktywności zaktualizowany." });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd podczas aktualizacji statusu dnia: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
     }
 }

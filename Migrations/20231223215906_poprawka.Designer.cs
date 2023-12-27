@@ -4,6 +4,7 @@ using GardenApp.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GardenApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231223215906_poprawka")]
+    partial class poprawka
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,40 +234,6 @@ namespace GardenApp.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GardenApp.API.Data.Models.WeatherMeasurement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MeasurementTime")
-                        .HasColumnType("int");
-
-                    b.Property<double>("Precipitation")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Temperature")
-                        .HasColumnType("float");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("WeatherMeasurements");
-                });
-
             modelBuilder.Entity("GardenApp.API.Data.Models.Calendar", b =>
                 {
                     b.HasOne("GardenApp.API.Data.Models.User", "User")
@@ -336,17 +305,6 @@ namespace GardenApp.API.Migrations
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.ProjectTask", b =>
-                {
-                    b.HasOne("GardenApp.API.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("GardenApp.API.Data.Models.WeatherMeasurement", b =>
                 {
                     b.HasOne("GardenApp.API.Data.Models.User", "User")
                         .WithMany()

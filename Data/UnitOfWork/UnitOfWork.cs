@@ -14,6 +14,7 @@ namespace GardenApp.API.Data.UnitOfWork
         public IBaseRepository<PlantProfile, int> PlantProfileRepository { get; set; }
         public IBaseRepository<ProjectTask, int> ProjectTaskRepository { get; set; }
         public IBaseRepository<User, int> UserRepository { get; set; }
+        public IBaseRepository<WeatherMeasurement, int> WeatherMeasurementRepository { get; set; }
 
         public UnitOfWork(DataContext context)
         {
@@ -26,6 +27,7 @@ namespace GardenApp.API.Data.UnitOfWork
             PlantProfileRepository = new BaseCrudRepository<PlantProfile, int>(context);
             ProjectTaskRepository = new BaseCrudRepository<ProjectTask, int>(context);
             UserRepository = new BaseCrudRepository<User, int>(context);
+            WeatherMeasurementRepository = new BaseCrudRepository<WeatherMeasurement, int>(context);
         }
     }
 }

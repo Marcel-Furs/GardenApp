@@ -14,5 +14,6 @@ namespace GardenApp.API.Data.UnitOfWork
         public IBaseRepository<PlantProfile, int> PlantProfileRepository { get; set; }
         public IBaseRepository<ProjectTask, int> ProjectTaskRepository { get; set; }
         public IBaseRepository<User, int> UserRepository { get; set; }
+        public IBaseRepository<WeatherMeasurement, int> WeatherMeasurementRepository { get; set; }
     }
 }

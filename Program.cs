@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using GardenApp.API.Mapper;
+using AutoMapper;
 
 namespace GardenApp
 {
@@ -23,6 +25,9 @@ namespace GardenApp
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("Default");            //do bazy danych
             builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));      //do bazy danych
+
+            builder.Services.AddAutoMapper(typeof(MapperProfile));                                  //Mapper
+
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();                                  //wstrzykiwanie wszystkich repozytoriow
 

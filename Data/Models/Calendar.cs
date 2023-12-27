@@ -10,6 +10,8 @@ namespace GardenApp.API.Data.Models
         public DateTime EventDate { get; set; }
         [Required]
         public string Description { get; set; }
+        [Required]
+        public bool IsActive { get; set; } = false;
         public int UserId { get; set; }
         [Required]
         public User User { get; set; } = null!;
