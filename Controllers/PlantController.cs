@@ -1,4 +1,5 @@
-﻿using GardenApp.API.Attributes;
+﻿using AutoMapper;
+using GardenApp.API.Attributes;
 using GardenApp.API.Data.Models;
 using GardenApp.API.Data.Repositories;
 using GardenApp.API.Data.UnitOfWork;
@@ -15,45 +16,23 @@ namespace GardenApp.API.Controllers
     {
         private static readonly string MediaDir = "./media";
         private readonly IUnitOfWork unitOfWork;
+        private readonly IMapper mapper;
 
-        public PlantController(IUnitOfWork unitOfWork)
+        public PlantController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
-        }
-
-        /*[HttpPost("create")]
-        public async Task<IActionResult> TestCreate([FromBody] string name)
-        {
-            await unitOfWork.PlantRepository.Create(new Plant
-            {
-                PlantName = name
-            });
-            return Ok();
-        }*/
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            //return Ok(await plantRepository.GetAll());
-            // return Ok(await plantRepository.Get(1));
-            //return Ok(await unitOfWork.PlantRepository.GetAll(x => x.Id == 2));
-            return Ok(await unitOfWork.PlantRepository.Get(x => x.PlantName == "stokrotka"));
-        }
-
-        [HttpGet("Marcel")]
-        public async Task<IActionResult> GetId()
-        {
-            //return Ok(await plantRepository.GetAll());
-            // return Ok(await plantRepository.Get(1));
-            return Ok(await unitOfWork.PlantRepository.GetAll(x => x.Id == 2));
-            //return Ok(await unitOfWork.PlantRepository.Get(x => x.PlantName == "stokrotka"));
+            this.mapper = mapper;
         }
 
         [HttpPost("Create")]
         public async Task<IActionResult> ImportFile([FromForm] PlantCreateDto model)
         {
-            //przypisanie planta do zmiennej na podstawie plantId
-            //jesli nie istnieje to zwroc jakis 404
+            //var deviceExists = await unitOfWork.DeviceRepository.Exists(device => device.Id == model.DeviceId);
+            //var profileExists = await unitOfWork.PlantProfileRepository.Exists(profile => profile.Id == model.PlantProfileId);
+            //if (!deviceExists || !profileExists)
+            //{
+            //    return NotFound("Device or PlantProfile not found");
+            //}
 
             var file = model.Image;
             string name = file.FileName;
@@ -76,6 +55,8 @@ namespace GardenApp.API.Controllers
                     {
                         PathImage = path,
                         PlantName = model.PlantName,
+                        DeviceId = model.DeviceId,
+                        PlantProfileId = model.PlantProfileId
                     };
                     await unitOfWork.PlantRepository.Add(plant);
                     return Ok(new { Message = "Created"});
@@ -85,17 +66,58 @@ namespace GardenApp.API.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpGet("Image/{name}")]
-        public IActionResult GetImage(string name)
+        [HttpGet("{id}/getDevice")]
+        public async Task<IActionResult> GetDevice(int id)
         {
-            var path = Path.Combine(MediaDir, name);
-            if (System.IO.File.Exists(path))
+            try
             {
-                Byte[] b = System.IO.File.ReadAllBytes(path);
-                return File(b, "image/" + Path.GetExtension(path));
+                var devices = await unitOfWork.DeviceRepository.GetAll(x => x.UserId == id);
+
+                return Ok(mapper.Map<List<DeviceDto>>(devices));
             }
-            
-            return NotFound();
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd podczas pobierania urządzeń: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
+        [HttpGet("getPlantProfiles")]
+        public async Task<IActionResult> GetPlantProfile()
+        {
+            try
+            {
+                var plantProfiles = await unitOfWork.PlantProfileRepository.GetAll();
+
+                return Ok(mapper.Map<List<PlantProfileDto>>(plantProfiles));
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd podczas pobierania profilukwiatkow: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
+
+        [HttpPost("createPlantProfile")]
+        public async Task<IActionResult> CreateSensor([FromBody] PlantProfileDto plantProfileDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                await unitOfWork.PlantProfileRepository.Create(new PlantProfile
+                {
+                    ProfileName = plantProfileDto.ProfileName
+                });
+                return Ok(new { Message = "Created" });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd przy tworzeniu rodzaju rośliny: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
         }
     }
 }

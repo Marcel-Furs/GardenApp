@@ -16,6 +16,8 @@ namespace GardenApp.API.Data
         public DbSet<ProjectTask> ProjectTasks { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<WeatherMeasurement> WeatherMeasurements { get; set; }
+        public DbSet<Sensor> Sensors { get; set; }
+        public DbSet<SensorType> SensorTypes { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options)
         : base(options)

@@ -8,6 +8,10 @@ namespace GardenApp.API.Data.Models
         public int Id { get; set; }
         [Required]
         public string PlantName { get; set; } = null!;
-        public string? PathImage { get; set; } 
+        public string? PathImage { get; set; }
+        public int DeviceId { get; set; }
+        public virtual Device Device { get; set; }
+        public int PlantProfileId { get; set; } 
+        public virtual PlantProfile PlantProfile { get; set; }
     }
 }

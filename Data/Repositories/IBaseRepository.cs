@@ -9,6 +9,7 @@ namespace GardenApp.API.Data.Repositories
         Task<List<T>> GetAll();
         Task<T> Get(Expression<Func<T, bool>> exp);
         Task<List<T>> GetAll(Expression<Func<T, bool>> exp);
+        Task<bool> Exists(Expression<Func<T, bool>> predicate);
         Task Update(T entity);
         Task Add(T entity);
         Task Delete(TKey id);

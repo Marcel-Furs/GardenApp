@@ -62,5 +62,9 @@ namespace GardenApp.API.Data.Repositories
         {
             return await table.Where(exp).ToListAsync();
         }
+        public async Task<bool> Exists(Expression<Func<T, bool>> predicate)
+        {
+            return await table.AnyAsync(predicate);
+        }
     }
 }

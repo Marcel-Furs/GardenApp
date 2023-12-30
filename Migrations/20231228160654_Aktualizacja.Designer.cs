@@ -4,6 +4,7 @@ using GardenApp.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GardenApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20231228160654_Aktualizacja")]
+    partial class Aktualizacja
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,8 +220,9 @@ namespace GardenApp.API.Migrations
                     b.Property<int>("DeviceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SensorTypeId")
-                        .HasColumnType("int");
+                    b.Property<string>("SensorType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SensorValue")
                         .IsRequired()
@@ -228,30 +232,7 @@ namespace GardenApp.API.Migrations
 
                     b.HasIndex("DeviceId");
 
-                    b.HasIndex("SensorTypeId");
-
-                    b.ToTable("Sensors");
-                });
-
-            modelBuilder.Entity("GardenApp.API.Data.Models.SensorType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("MeasurementUnit")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SensorTypes");
+                    b.ToTable("Sensor");
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.User", b =>
@@ -406,15 +387,7 @@ namespace GardenApp.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GardenApp.API.Data.Models.SensorType", "SensorType")
-                        .WithMany("Sensors")
-                        .HasForeignKey("SensorTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Device");
-
-                    b.Navigation("SensorType");
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.WeatherMeasurement", b =>
@@ -438,11 +411,6 @@ namespace GardenApp.API.Migrations
             modelBuilder.Entity("GardenApp.API.Data.Models.PlantProfile", b =>
                 {
                     b.Navigation("Plants");
-                });
-
-            modelBuilder.Entity("GardenApp.API.Data.Models.SensorType", b =>
-                {
-                    b.Navigation("Sensors");
                 });
 #pragma warning restore 612, 618
         }

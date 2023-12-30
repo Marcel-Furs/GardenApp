@@ -11,10 +11,8 @@ namespace GardenApp.API.Data.Models
         [Required]
         public int UserId { get; set; }
         [Required]
-        public User User { get; set; }
-        [Required]
-        public int PlantId { get; set; }
-        [Required]
-        public Plant Plant { get; set; }
+        public virtual User User { get; set; }
+        public virtual ICollection<Plant> Plants { get; set; }
+        public virtual ICollection<Sensor> Sensors { get; set; }
     }
 }
