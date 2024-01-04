@@ -42,9 +42,9 @@ namespace GardenApp.API.Controllers
             {
                 file.CopyTo(memoryStream);
 
-                if(memoryStream.Length > 0)
+                if (memoryStream.Length > 0)
                 {
-                    if(!Directory.Exists(MediaDir))
+                    if (!Directory.Exists(MediaDir))
                     {
                         Directory.CreateDirectory(MediaDir);
                     }
@@ -59,7 +59,7 @@ namespace GardenApp.API.Controllers
                         PlantProfileId = model.PlantProfileId
                     };
                     await unitOfWork.PlantRepository.Add(plant);
-                    return Ok(new { Message = "Created"});
+                    return Ok(new { Message = "Created" });
                 }
             }
 
@@ -110,6 +110,29 @@ namespace GardenApp.API.Controllers
                 await unitOfWork.PlantProfileRepository.Create(new PlantProfile
                 {
                     ProfileName = plantProfileDto.ProfileName
+                });
+                return Ok(new { Message = "Created" });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd przy tworzeniu rodzaju rośliny: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
+
+        [HttpPost("createCondition")]
+        public async Task<IActionResult> CreateCondition([FromBody] ConditionDto conditionDto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                await unitOfWork.ConditionRepository.Create(new Condition
+                {
+                    Description = conditionDto.Description
                 });
                 return Ok(new { Message = "Created" });
             }

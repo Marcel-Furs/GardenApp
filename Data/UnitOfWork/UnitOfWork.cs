@@ -9,14 +9,13 @@ namespace GardenApp.API.Data.UnitOfWork
         public IBaseRepository<Condition, int> ConditionRepository { get; set; }
         public IBaseRepository<Device, int> DeviceRepository { get; set; }
         public IBaseRepository<History, int> HistoryRepository { get; set; }
-        public IBaseRepository<Notification, int> NotificationRepository { get; set; }
         public IBaseRepository<Plant, int> PlantRepository { get; set; }
         public IBaseRepository<PlantProfile, int> PlantProfileRepository { get; set; }
-        public IBaseRepository<ProjectTask, int> ProjectTaskRepository { get; set; }
         public IBaseRepository<User, int> UserRepository { get; set; }
         public IBaseRepository<WeatherMeasurement, int> WeatherMeasurementRepository { get; set; }
         public IBaseRepository<Sensor, int> SensorRepository { get; set; }
         public IBaseRepository<SensorType, int> SensorTypeRepository { get; set; }
+        public IBaseRepository<Diary, int> DiaryRepository { get; set; }
 
         public UnitOfWork(DataContext context)
         {
@@ -24,14 +23,13 @@ namespace GardenApp.API.Data.UnitOfWork
             ConditionRepository = new BaseCrudRepository<Condition, int>(context);
             DeviceRepository = new BaseCrudRepository<Device, int>(context);
             HistoryRepository = new BaseCrudRepository<History, int>(context);
-            NotificationRepository = new BaseCrudRepository<Notification, int>(context);
             PlantRepository = new BaseCrudRepository<Plant, int>(context);
             PlantProfileRepository = new BaseCrudRepository<PlantProfile, int>(context);
-            ProjectTaskRepository = new BaseCrudRepository<ProjectTask, int>(context);
             UserRepository = new BaseCrudRepository<User, int>(context);
             WeatherMeasurementRepository = new BaseCrudRepository<WeatherMeasurement, int>(context);
             SensorRepository = new BaseCrudRepository<Sensor, int>(context);
             SensorTypeRepository = new BaseCrudRepository<SensorType, int>(context);
+            DiaryRepository = new BaseCrudRepository<Diary, int>(context);
 
         }
     }

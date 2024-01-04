@@ -103,6 +103,24 @@ namespace GardenApp.API.Mapper
             .ForMember(dest => dest.PlantProfileId, opt => opt.MapFrom(src => src.PlantProfileId))
             // Ignoruj Image, ponieważ jest to IFormFile i nie możemy mapować z stringa na plik
             .ForMember(dest => dest.Image, opt => opt.Ignore());
+
+            CreateMap<Plant, PlantReadDto>()
+           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+           .ForMember(dest => dest.PlantName, opt => opt.MapFrom(src => src.PlantName))
+           .ForMember(dest => dest.PathImage, opt => opt.MapFrom(src => src.PathImage))
+           // Mapowanie nazw urządzeń i profili roślin
+           .ForMember(dest => dest.DeviceName, opt => opt.MapFrom(src => src.Device.DeviceName)) // Zakładając, że Plant ma powiązanie z Device
+           .ForMember(dest => dest.PlantProfileName, opt => opt.MapFrom(src => src.PlantProfile.ProfileName)); // Zakładając, że Plant ma powiązanie z PlantProfile
+
+            CreateMap<Diary, DiaryDto>()
+             .ForMember(dto => dto.PlantIds, opt => opt.MapFrom(diary => diary.Plants.Select(p => p.Id)))
+             .ForMember(dto => dto.CalendarIds, opt => opt.MapFrom(diary => diary.Calendars.Select(c => c.Id)));
+
+            // Mapowanie DiaryDto -> Diary
+            CreateMap<DiaryDto, Diary>()
+                .ForMember(diary => diary.Plants, opt => opt.Ignore()) // Ignore, ponieważ wymaga specjalnej obsługi
+                .ForMember(diary => diary.Calendars, opt => opt.Ignore()) // Ignore, podobnie jak wyżej
+                .ForMember(diary => diary.User, opt => opt.MapFrom(dto => new User { Id = dto.UserId })); // Zakładamy prostą konwersję tylko z UserId
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GardenApp.API.Attributes;
+using GardenApp.API.Data.Models;
 using GardenApp.API.Data.UnitOfWork;
 using GardenApp.API.Dto;
 using GardenApp.API.Migrations;
@@ -20,16 +21,33 @@ namespace GardenApp.API.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet("getPlants")]
-        public async Task<IActionResult> GetPlants()
+        [HttpGet("{id}/getPlants")]
+        public async Task<IActionResult> GetPlants(int id)
         {
             try
             {
-                var plants = await unitOfWork.PlantRepository.GetAll();
-                var plantDtos = mapper.Map<List<PlantCreateDto>>(plants);
+                // Pobieranie tylko profili roślin i urządzeń należących do użytkownika o danym ID
+                var devices = await unitOfWork.DeviceRepository.GetAll(x => x.UserId == id);
+                var plantProfiles = await unitOfWork.PlantProfileRepository.GetAll();
 
+                var deviceIds = devices.Select(d => d.Id).ToList(); // Pobierz Id urządzeń do listy
+                var plants = await unitOfWork.PlantRepository.GetAll(x => deviceIds.Contains(x.DeviceId));
+                var plantReadDtos = new List<PlantReadDto>();
 
-                return Ok(plantDtos);
+                foreach (var plant in plants)
+                {
+                    var device = devices.FirstOrDefault(d => d.Id == plant.DeviceId);
+                    var plantProfile = plantProfiles.FirstOrDefault(pp => pp.Id == plant.PlantProfileId);
+
+                    var plantReadDto = mapper.Map<PlantReadDto>(plant);
+                    plantReadDto.Id = plant.Id;
+                    plantReadDto.DeviceName = device?.DeviceName;
+                    plantReadDto.PlantProfileName = plantProfile?.ProfileName;
+
+                    plantReadDtos.Add(plantReadDto);
+                }
+
+                return Ok(plantReadDtos);
             }
             catch (Exception ex)
             {
@@ -41,8 +59,8 @@ namespace GardenApp.API.Controllers
         [HttpGet("{name}/Image")]
         public IActionResult GetImage(string name)
         {
-            //string result = name.Replace("\\", "/");
-            var path = Path.Combine(MediaDir, name);
+            var newName = RemoveMediaPathPrefix(name);
+            var path = Path.Combine(MediaDir, newName);
             if (System.IO.File.Exists(path))
             {
                 Byte[] b = System.IO.File.ReadAllBytes(path);
@@ -50,6 +68,17 @@ namespace GardenApp.API.Controllers
             }
 
             return NotFound();
+        }
+        private static string RemoveMediaPathPrefix(string path)
+        {
+            string prefix = ".%2Fmedia\\";
+
+            if (path.StartsWith(prefix))
+            {
+                return path.Substring(prefix.Length);
+            }
+
+            return path;
         }
     }
 }
