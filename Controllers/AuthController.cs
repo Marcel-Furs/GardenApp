@@ -21,6 +21,11 @@ namespace GardenApp.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserDto userDto)
         {
+            if (userDto == null)
+            {
+                return BadRequest("User data is missing");
+            }
+
             if (ModelState.IsValid)
             {
                 try

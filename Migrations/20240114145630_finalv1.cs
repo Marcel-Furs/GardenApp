@@ -5,7 +5,7 @@
 namespace GardenApp.API.Migrations
 {
     /// <inheritdoc />
-    public partial class checkv3 : Migration
+    public partial class finalv1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

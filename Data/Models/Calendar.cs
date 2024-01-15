@@ -13,6 +13,8 @@ namespace GardenApp.API.Data.Models
         [Required]
         public bool IsActive { get; set; } = false;
         public int UserId { get; set; }
+        public int? DiaryId { get; set; }
+        public Diary? Diary { get; set; }
         [Required]
         public User User { get; set; } = null!;
     }

@@ -159,6 +159,9 @@ namespace GardenApp.API.Migrations
                     b.Property<int?>("DiaryId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PathImage")
                         .HasColumnType("nvarchar(max)");
 
@@ -306,7 +309,7 @@ namespace GardenApp.API.Migrations
 
             modelBuilder.Entity("GardenApp.API.Data.Models.Calendar", b =>
                 {
-                    b.HasOne("GardenApp.API.Data.Models.Diary", null)
+                    b.HasOne("GardenApp.API.Data.Models.Diary", "Diary")
                         .WithMany("Calendars")
                         .HasForeignKey("DiaryId");
 
@@ -315,6 +318,8 @@ namespace GardenApp.API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Diary");
 
                     b.Navigation("User");
                 });
@@ -371,7 +376,7 @@ namespace GardenApp.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GardenApp.API.Data.Models.Diary", null)
+                    b.HasOne("GardenApp.API.Data.Models.Diary", "Diary")
                         .WithMany("Plants")
                         .HasForeignKey("DiaryId");
 
@@ -382,6 +387,8 @@ namespace GardenApp.API.Migrations
                         .IsRequired();
 
                     b.Navigation("Device");
+
+                    b.Navigation("Diary");
 
                     b.Navigation("PlantProfile");
                 });

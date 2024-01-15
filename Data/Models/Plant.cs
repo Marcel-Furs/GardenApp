@@ -12,6 +12,9 @@ namespace GardenApp.API.Data.Models
         public int DeviceId { get; set; }
         public virtual Device Device { get; set; }
         public int PlantProfileId { get; set; } 
+        public bool IsActive { get; set; }
+        public int? DiaryId { get; set; }
+        public Diary? Diary { get; set; }
         public virtual PlantProfile PlantProfile { get; set; }
     }
 }

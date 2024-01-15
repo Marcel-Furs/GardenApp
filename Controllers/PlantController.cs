@@ -27,12 +27,6 @@ namespace GardenApp.API.Controllers
         [HttpPost("Create")]
         public async Task<IActionResult> ImportFile([FromForm] PlantCreateDto model)
         {
-            //var deviceExists = await unitOfWork.DeviceRepository.Exists(device => device.Id == model.DeviceId);
-            //var profileExists = await unitOfWork.PlantProfileRepository.Exists(profile => profile.Id == model.PlantProfileId);
-            //if (!deviceExists || !profileExists)
-            //{
-            //    return NotFound("Device or PlantProfile not found");
-            //}
 
             var file = model.Image;
             string name = file.FileName;
@@ -56,7 +50,8 @@ namespace GardenApp.API.Controllers
                         PathImage = path,
                         PlantName = model.PlantName,
                         DeviceId = model.DeviceId,
-                        PlantProfileId = model.PlantProfileId
+                        PlantProfileId = model.PlantProfileId,
+                        IsActive = true
                     };
                     await unitOfWork.PlantRepository.Add(plant);
                     return Ok(new { Message = "Created" });

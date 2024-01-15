@@ -7,5 +7,6 @@
         public string PathImage { get; set; } = null!;
         public int DeviceId { get; set; }
         public int PlantProfileId { get; set; }
+        public int IsActive { get; set; }
     }
 }

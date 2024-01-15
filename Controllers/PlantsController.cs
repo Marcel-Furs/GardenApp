@@ -3,7 +3,6 @@ using GardenApp.API.Attributes;
 using GardenApp.API.Data.Models;
 using GardenApp.API.Data.UnitOfWork;
 using GardenApp.API.Dto;
-using GardenApp.API.Migrations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GardenApp.API.Controllers
@@ -26,11 +25,11 @@ namespace GardenApp.API.Controllers
         {
             try
             {
-                // Pobieranie tylko profili roślin i urządzeń należących do użytkownika o danym ID
+                
                 var devices = await unitOfWork.DeviceRepository.GetAll(x => x.UserId == id);
                 var plantProfiles = await unitOfWork.PlantProfileRepository.GetAll();
 
-                var deviceIds = devices.Select(d => d.Id).ToList(); // Pobierz Id urządzeń do listy
+                var deviceIds = devices.Select(d => d.Id).ToList();
                 var plants = await unitOfWork.PlantRepository.GetAll(x => deviceIds.Contains(x.DeviceId));
                 var plantReadDtos = new List<PlantReadDto>();
 
@@ -80,5 +79,28 @@ namespace GardenApp.API.Controllers
 
             return path;
         }
+        [HttpPost("{id}/updatePlant")]
+        public async Task<IActionResult> UpdatePlantStatus(int id)
+        {
+            try
+            {
+                var plant = await unitOfWork.PlantRepository.Get(id);
+                if (plant == null)
+                {
+                    return NotFound($"Roślina o ID {id} nie została znaleziona.");
+                }
+
+                plant.IsActive = false;
+                unitOfWork.PlantRepository.Update(plant);
+
+                return Ok(new { Message = "Status aktywności rośliny zaktualizowany na nieaktywny." });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Błąd podczas aktualizacji statusu rośliny: {ex.Message}");
+                return StatusCode(500, "Wystąpił błąd podczas przetwarzania żądania.");
+            }
+        }
+
     }
 }

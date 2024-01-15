@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GardenApp.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20231228193416_Aktualizacjav2")]
-    partial class Aktualizacjav2
+    [Migration("20240114145630_finalv1")]
+    partial class finalv1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,9 @@ namespace GardenApp.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("DiaryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
 
@@ -47,6 +50,8 @@ namespace GardenApp.API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DiaryId");
 
                     b.HasIndex("UserId");
 
@@ -97,6 +102,31 @@ namespace GardenApp.API.Migrations
                     b.ToTable("Devices");
                 });
 
+            modelBuilder.Entity("GardenApp.API.Data.Models.Diary", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Diaries");
+                });
+
             modelBuilder.Entity("GardenApp.API.Data.Models.History", b =>
                 {
                     b.Property<int>("Id")
@@ -118,28 +148,6 @@ namespace GardenApp.API.Migrations
                     b.ToTable("Histories");
                 });
 
-            modelBuilder.Entity("GardenApp.API.Data.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("GardenApp.API.Data.Models.Plant", b =>
                 {
                     b.Property<int>("Id")
@@ -150,6 +158,12 @@ namespace GardenApp.API.Migrations
 
                     b.Property<int>("DeviceId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("DiaryId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PathImage")
                         .HasColumnType("nvarchar(max)");
@@ -164,6 +178,8 @@ namespace GardenApp.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DeviceId");
+
+                    b.HasIndex("DiaryId");
 
                     b.HasIndex("PlantProfileId");
 
@@ -185,28 +201,6 @@ namespace GardenApp.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlantProfiles");
-                });
-
-            modelBuilder.Entity("GardenApp.API.Data.Models.ProjectTask", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ProjectTasks");
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.Sensor", b =>
@@ -318,11 +312,17 @@ namespace GardenApp.API.Migrations
 
             modelBuilder.Entity("GardenApp.API.Data.Models.Calendar", b =>
                 {
+                    b.HasOne("GardenApp.API.Data.Models.Diary", "Diary")
+                        .WithMany("Calendars")
+                        .HasForeignKey("DiaryId");
+
                     b.HasOne("GardenApp.API.Data.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Diary");
 
                     b.Navigation("User");
                 });
@@ -349,6 +349,17 @@ namespace GardenApp.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("GardenApp.API.Data.Models.Diary", b =>
+                {
+                    b.HasOne("GardenApp.API.Data.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("GardenApp.API.Data.Models.History", b =>
                 {
                     b.HasOne("GardenApp.API.Data.Models.Device", "Device")
@@ -360,17 +371,6 @@ namespace GardenApp.API.Migrations
                     b.Navigation("Device");
                 });
 
-            modelBuilder.Entity("GardenApp.API.Data.Models.Notification", b =>
-                {
-                    b.HasOne("GardenApp.API.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("GardenApp.API.Data.Models.Plant", b =>
                 {
                     b.HasOne("GardenApp.API.Data.Models.Device", "Device")
@@ -378,6 +378,10 @@ namespace GardenApp.API.Migrations
                         .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("GardenApp.API.Data.Models.Diary", "Diary")
+                        .WithMany("Plants")
+                        .HasForeignKey("DiaryId");
 
                     b.HasOne("GardenApp.API.Data.Models.PlantProfile", "PlantProfile")
                         .WithMany("Plants")
@@ -387,18 +391,9 @@ namespace GardenApp.API.Migrations
 
                     b.Navigation("Device");
 
+                    b.Navigation("Diary");
+
                     b.Navigation("PlantProfile");
-                });
-
-            modelBuilder.Entity("GardenApp.API.Data.Models.ProjectTask", b =>
-                {
-                    b.HasOne("GardenApp.API.Data.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.Sensor", b =>
@@ -436,6 +431,13 @@ namespace GardenApp.API.Migrations
                     b.Navigation("Plants");
 
                     b.Navigation("Sensors");
+                });
+
+            modelBuilder.Entity("GardenApp.API.Data.Models.Diary", b =>
+                {
+                    b.Navigation("Calendars");
+
+                    b.Navigation("Plants");
                 });
 
             modelBuilder.Entity("GardenApp.API.Data.Models.PlantProfile", b =>
